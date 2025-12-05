@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Produk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cart-icon:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .cart-count {
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .category-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .category-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .product-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .product-prices {
+            margin-bottom: 15px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .price-item:last-child {
+            border-bottom: none;
+        }
+
+        .price-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .price-value {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .grosir-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #764ba2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            margin: 0 -10px;
+            padding: 0 10px;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        .price-type-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.75em;
+            margin-left: 5px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .qty-btn:hover {
+            background: #764ba2;
+        }
+
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #667eea;
+            text-align: right;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .checkout-btn:hover {
+            background: #128C7E;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .cart-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .quantity-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛍️ Katalog Produk</h1>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 Keranjang <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </header>
+
+        <div class="category-filter">
+            <div class="category-buttons" id="categoryButtons"></div>
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Keranjang Belanja</h2>
+                <button class="close-btn" onclick="toggleCart()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="cartItems"></div>
+                <div class="cart-total" id="cartTotal"></div>
+                <button class="checkout-btn" onclick="sendToWhatsApp()">
+                    <span style="font-size: 1.5em;">📱</span> Pesan via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GANTI NOMOR WHATSAPP DI SINI (format: 628xxxxxxxxxx)
+        const WHATSAPP_NUMBER = '6281119745346';
+
+        // Data produk dengan kategori dan harga lusin/grosir
+        const products = [
+            {
+                id: 1,
+                name: 'Produk A1',
+                description: 'Deskripsi produk A1 yang menarik',
+                category: 'Kategori A',
+                priceLusin: 150000,
+                priceGrosir: 140000,
+                image: '🎁'
+            },
+            {
+                id: 2,
+                name: 'Produk A2',
+                description: 'Deskripsi produk A2 yang berkualitas',
+                category: 'Kategori A',
+                priceLusin: 200000,
+                priceGrosir: 185000,
+                image: '📦'
+            },
+            {
+                id: 3,
+                name: 'Produk B1',
+                description: 'Deskripsi produk B1 yang premium',
+                category: 'Kategori B',
+                priceLusin: 300000,
+                priceGrosir: 280000,
+                image: '🎀'
+            },
+            {
+                id: 4,
+                name: 'Produk B2',
+                description: 'Deskripsi produk B2 yang eksklusif',
+                category: 'Kategori B',
+                priceLusin: 250000,
+                priceGrosir: 235000,
+                image: '🎊'
+            },
+            {
+                id: 5,
+                name: 'Produk C1',
+                description: 'Deskripsi produk C1 yang istimewa',
+                category: 'Kategori C',
+                priceLusin: 180000,
+                priceGrosir: 170000,
+                image: '🎈'
+            },
+            {
+                id: 6,
+                name: 'Produk C2',
+                description: 'Deskripsi produk C2 yang luar biasa',
+                category: 'Kategori C',
+                priceLusin: 350000,
+                priceGrosir: 330000,
+                image: '🎉'
+            }
+        ];
+
+        let cart = [];
+        let selectedCategory = 'Semua';
+
+        function formatRupiah(amount) {
+            return 'Rp ' + amount.toLocaleString('id-ID');
+        }
+
+        function getCategories() {
+            const categories = ['Semua', ...new Set(products.map(p => p.category))];
+            return categories;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryButtons');
+            const categories = getCategories();
+            
+            container.innerHTML = categories.map(category => `
+                <button class="category-btn ${category === selectedCategory ? 'active' : ''}" 
+                        onclick="filterByCategory('${category}')">
+                    ${category}
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(category) {
+            selectedCategory = category;
+            renderCategories();
+            renderProducts();
+        }
+
+        function getFilteredProducts() {
+            if (selectedCategory === 'Semua') {
+                return products;
+            }
+            return products.filter(p => p.category === selectedCategory);
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const filteredProducts = getFilteredProducts();
+            
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${product.image}</div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        
+                        <div class="product-prices">
+                            <div class="price-item">
+                                <span class="price-label">Harga Lusin (1-2 lusin):</span>
+                                <span class="price-value">${formatRupiah(product.priceLusin)}</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="price-label">Harga Grosir (≥3 lusin):</span>
+                                <span class="price-value">${formatRupiah(product.priceGrosir)}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grosir-note">
+                            💰 Hemat ${formatRupiah(product.priceLusin - product.priceGrosir)}/lusin untuk pembelian ≥3 lusin
+                        </div>
+                        
+                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                            Tambah ke Keranjang
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCart();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        function getItemPrice(item) {
+            // Jika quantity >= 3 lusin, gunakan harga grosir
+            if (item.quantity >= 3) {
+                return {
+                    price: item.priceGrosir,
+                    type: 'Grosir'
+                };
+            }
+            return {
+                price: item.priceLusin,
+                type: 'Lusin'
+            };
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart">Keranjang masih kosong</div>';
+                cartTotal.innerHTML = '';
+            } else {
+                cartItems.innerHTML = cart.map(item => {
+                    const priceInfo = getItemPrice(item);
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-price">
+                                    ${formatRupiah(priceInfo.price)}/lusin
+                                    <span class="price-type-badge">${priceInfo.type}</span>
+                                </div>
+                                <div style="color: #666; font-size: 0.85em; margin-top: 3px;">
+                                    Subtotal: ${formatRupiah(priceInfo.price * item.quantity)}
+                                </div>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <span style="font-weight: bold;">${item.quantity} lusin</span>
+                                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                                <button class="remove-btn" onclick="removeFromCart(${item.id})">Hapus</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const total = cart.reduce((sum, item) => {
+                    const priceInfo = getItemPrice(item);
+                    return sum + (priceInfo.price * item.quantity);
+                }, 0);
+                
+                cartTotal.innerHTML = `Total: ${formatRupiah(total)}`;
+            }
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.classList.toggle('active');
+        }
+
+        function sendToWhatsApp() {
+            if (cart.length === 0) {
+                alert('Keranjang masih kosong!');
+                return;
+            }
+
+            let message = 'Hai kak saya mau pesan ini\n\n';
+            message += '*DETAIL PESANAN*\n\n';
+            
+            cart.forEach(item => {
+                const priceInfo = getItemPrice(item);
+                message += `📦 *${item.name}*\n`;
+                message += `   Jumlah: ${item.quantity} lusin\n`;
+                message += `   Harga: ${formatRupiah(priceInfo.price)}/lusin (${priceInfo.type})\n`;
+                message += `   Subtotal: ${formatRupiah(priceInfo.price * item.quantity)}\n\n`;
+            });
+
+            const total = cart.reduce((sum, item) => {
+                const priceInfo = getItemPrice(item);
+                return sum + (priceInfo.price * item.quantity);
+            }, 0);
+            
+            message += `\n💰 *TOTAL: ${formatRupiah(total)}*`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+            
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Initialize
+        renderCategories();
+        renderProducts();
+        updateCart();
+    </script>
+</body>
+</html>
